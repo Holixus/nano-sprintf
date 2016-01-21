@@ -14,6 +14,19 @@ A simple sprintf-like function
 var sprintf = require('nano-sprintf');
 ```
 
+* %-?\d*[sdxXB]
+  * s -- string
+  * d -- decimal number
+  * x -- low case hexadecimal
+  * X -- up case hexadecimal
+  * b -- binary (0101010)
+
+## Aligning
+
+* `%10s`  -- left spaces padding
+* `%-10s` -- right spaces padding
+
+
 [gitter-image]: https://badges.gitter.im/Holixus/nano-sprintf.svg
 [gitter-url]: https://gitter.im/Holixus/nano-sprintf
 
