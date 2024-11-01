@@ -1,15 +1,37 @@
 "use strict";
 
-module.exports = function sprintf(fmt, a, b) {
-	var re = /%(-?\d*)([sdxXb])/g,
+const strf_zeros  = '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+      strf_spaces = '                                                                                                  ';
+
+module.exports = function sprintf(fmt, a, b)
+{
+	var re = /%(-?\d+(?:\.?\d+)?)?([sdfxXb])/g,
 	    args = arguments, index = 0;
 
 	function justify(str, width) {
-		var fill = (width < 0 ? -width : width ) - str.length;
+		var ws = width.split('.'),
+		    dotw = +(ws[1] | 0);
+		width = +ws[0];
+		if (width < 0) {
+			var is_left = 1;
+			width *= -1;
+		}
+		if (dotw) {
+			ss = str.split('.');
+			if (!ss[1])
+				str += '.00000000000000000000000000000'.slice(0, dotw + 1);
+			else {
+				var dot_pad = dotw - ss[1].length;
+				if (dot_pad > 0)
+					str += '000000000000000000000000000000'.slice(0, dot_pad);
+			}
+			width += dotw + 1;
+		}
+		var fill = width - str.length;
 		if (fill < 0)
 			fill = 0;
-		fill = '                                                                                                                            '.slice(0, fill);
-		return width < 0 ? str + fill : fill + str;
+		fill = (ws[0].slice(0, 1) == '0' ? strf_zeros : strf_spaces).slice(0, fill);
+		return is_left ? str + fill : fill + str;
 	}
 
 	function to_string(o) {
@@ -31,10 +53,10 @@ module.exports = function sprintf(fmt, a, b) {
 		if (type === 's')
 			a = to_string(a);
 		else {
-			a = parseInt(a).toString([10, 16, 16, 2]['dxXb'.indexOf(type)]);
+			a = (+a).toString([10, 10, 16, 16, 2]['dfxXb'.indexOf(type)]);
 			if (type === 'X')
 				a = a.toUpperCase();
 		}
-		return justify(a, width | 0);
+		return justify(a, width || '');
 	});
 };
